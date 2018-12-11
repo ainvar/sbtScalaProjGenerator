@@ -18,7 +18,7 @@ buildSbt="\nname := \"$1\"
 
 \nversion := \"0.1.0\"
 
-\nscalaVersion := \"2.11.8\"
+\nscalaVersion := \"2.12.8\"
 
 \nresolvers += \"Typesafe Repository\" at \"http://repo.typesafe.com/typesafe/releases/\"
 
@@ -146,7 +146,7 @@ mkdir -p $1/src/site
 
 # Files
 # build.properties SBT version default 1.0.3
-echo "sbt.version=1.0.3"  > $1/project/build.properties
+echo "sbt.version=1.2.7"  > $1/project/build.properties
 
 # .gitignore
 echo "# Sbt / Play
