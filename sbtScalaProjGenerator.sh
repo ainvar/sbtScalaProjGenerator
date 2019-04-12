@@ -13,7 +13,7 @@ die() { yell "$*"; exit 111; }
 try() { "$@" || die "cannot $*"; }
 
 
-echo "I'm creating for u a scala sbt project !!"
+echo "I'm creating for u a scala sbt project with love !!"
 buildSbt="\nname := \"$1\"
 
 \nversion := \"0.1.0\"
@@ -51,19 +51,20 @@ sbtLibDep="libraryDependencies ++= Seq(
 
 
 echo "$# parameters:";
-echo Using '$*';
+
 for p in $*;
 do
     echo "[$p]";
 done;
 
-echo "\nSetting up the project... "
+printf "\nSetting up the project... "
 blnAkka=FALSE
 blnPlay=FALSE
 blnFx=FALSE
 blnConsole=FALSE
 blnHttp=FALSE
 blnPlug=FALSE
+blnFinagle=FALSE
 
 for p in $@;
 do
@@ -80,6 +81,8 @@ do
 	    http|HTTP|Http) blnHttp=TRUE
 	    ;;
 	    withPlugins|WITHPLUGINS|withplugins) blnPlug=TRUE
+		;;
+		finagle|FINAGLE|Finagle) blnFinagle=TRUE
 	    ;;
 	    \?) echo "Invalid option -$OPTARG" >&2
 	    ;;
@@ -94,9 +97,14 @@ if $blnAkka; then
 	printf "Added AKKA!!\n";
 fi
 
-#if $blnPlay; then 
 
-#fi
+if $blnPlay; then 
+	sbtLibDep=$sbtLibDep"\n\t,\"com.typesafe.play\" %% \"play\" % \"2.7.0\""
+	sbtLibDep=$sbtLibDep"\n\t,\"com.typesafe.play\" %% \"play-test\" % \"2.7.0\" % Test\""
+	sbtLibDep=$sbtLibDep"\n\t,\"com.typesafe.play\" %% \"play-ws\" % \"2.7.0\""
+	sbtLibDep=$sbtLibDep"\n\t,\"com.typesafe.play\" %% \"play-json\" % \"2.7.2\""
+	printf "Added Play stack!!";
+fi
 
 if $blnFx; then 
 	sbtLibDep=$sbtLibDep"\n\t,\"org.scalafx\" %% \"scalafx\" % \"8.0.102-R11\""
@@ -108,7 +116,12 @@ if $blnHttp; then
 	printf "Added akka http!!\n";
 fi
 
-sbtLibDep=$sbtLibDep")"
+if $blnFinagle; then 
+	sbtLibDep=$sbtLibDep"\n\t,\"com.twitter\" %% \"finagle-http\" % \"19.3.0\""
+	printf "Added Finagle HTTP!!\n";
+fi
+
+sbtLibDep=$sbtLibDep")"\
 
 if $blnConsole; then 
 	sbtLibDep=$sbtLibDep"\nmainClass in assembly := Some(\"Main\")"
@@ -130,6 +143,7 @@ plugins=$plugins"\naddSbtPlugin(\"com.eed3si9n\" % \"sbt-buildinfo\" % \"0.7.0\"
 plugins=$plugins"\naddSbtPlugin(\"com.typesafe.sbt\" % \"sbt-git\" % \"0.9.3\")\n"
 
 plugins=$plugins"\naddSbtPlugin(\"com.timushev.sbt\" % \"sbt-updates\" % \"0.3.1\")\n"
+plugins=$plugins"\naddSbtPlugin(\"net.virtual-void\" % \"sbt-dependency-graph\" % \"0.9.2\")\n"
 
 if $blnConsole; then 
 	plugins=$plugins"\naddSbtPlugin(\"com.eed3si9n\" % \"sbt-assembly\" % \"0.14.5\")"
